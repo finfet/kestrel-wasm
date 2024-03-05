@@ -70,6 +70,11 @@ pub fn scrypt(password: &[u8], salt: &[u8], n: u32, r: u32, p: u32, dk_len: usiz
     kestrel_crypto::scrypt(password, salt, n, r, p, dk_len)
 }
 
+#[wasm_bindgen]
+pub fn sha256(data: &[u8]) -> Vec<u8> {
+    kestrel_crypto::sha256(data).to_vec()
+}
+
 fn fmt_error(err: &dyn std::any::Any) -> JsValue {
     fn err_msg(name: &str, msg: &str) -> JsValue {
         format!("{}; {}", name, msg).into()
