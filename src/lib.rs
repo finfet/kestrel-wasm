@@ -16,15 +16,19 @@ pub fn chapoly_decrypt_ietf(
     nonce: &[u8],
     ciphertext: &[u8],
     aad: &[u8],
-) -> Result<Vec<u8>, JsError> {
+) -> Result<Vec<u8>, JsValue> {
     Ok(kestrel_crypto::chapoly_decrypt_ietf(
         key, nonce, ciphertext, aad,
-    )?)
+    ).map_err(|e| format_error(&e, "ChaPolyDecryptError", e.to_string().as_str()))?)
 }
 
 #[wasm_bindgen]
 pub fn scrypt(password: &[u8], salt: &[u8], n: u32, r: u32, p: u32, dk_len: usize) -> Vec<u8> {
     kestrel_crypto::scrypt(password, salt, n, r, p, dk_len)
+}
+
+fn format_error<E: std::error::Error>(err: &E, name: &str, message: &str) -> JsValue {
+    format!("{}: {}", name, message).into()
 }
 
 #[cfg(test)]
