@@ -32,7 +32,7 @@ pub fn pass_encrypt(
     } else {
         return Err(fmt_error(&"Invalid password file format version"));
     };
-    let mut ciphertext = Vec::<u8>::new();
+    let mut ciphertext: Vec<u8> = Vec::with_capacity(calc_capacity(plaintext.len()));
     let salt: [u8; 32] = salt
         .try_into()
         .map_err(|_| fmt_error(&"Invalid salt length. Must be 32."))?;
@@ -59,7 +59,7 @@ pub fn pass_decrypt(
         return Err(fmt_error(&"Invalid password file format version"));
     };
 
-    let mut plaintext = Vec::<u8>::new();
+    let mut plaintext: Vec<u8> = Vec::with_capacity(calc_capacity(ciphertext.len()));
     kestrel_crypto::decrypt::pass_decrypt(&mut ciphertext, &mut plaintext, password, pass_ver)
         .map_err(|e| fmt_error(&e))?;
     Ok(plaintext)
@@ -110,6 +110,10 @@ fn fmt_error(err: &dyn std::any::Any) -> JsValue {
     } else {
         err_msg("Unknown", "Unknown")
     }
+}
+
+fn calc_capacity(len: usize) -> usize {
+    len + ((((len / 65536) + 1) * 32) + 128)
 }
 
 #[cfg(test)]
