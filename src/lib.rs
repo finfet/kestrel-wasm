@@ -66,8 +66,23 @@ pub fn pass_decrypt(
 }
 
 #[wasm_bindgen]
+pub fn x25519(k: &[u8], u: &[u8]) -> Vec<u8> {
+    kestrel_crypto::x25519(k, u).to_vec()
+}
+
+#[wasm_bindgen]
+pub fn x25519_derive_public(private_key: &[u8]) -> Vec<u8> {
+    kestrel_crypto::x25519_derive_public(private_key).to_vec()
+}
+
+#[wasm_bindgen]
 pub fn scrypt(password: &[u8], salt: &[u8], n: u32, r: u32, p: u32, dk_len: usize) -> Vec<u8> {
     kestrel_crypto::scrypt(password, salt, n, r, p, dk_len)
+}
+
+#[wasm_bindgen]
+pub fn secure_random(len: usize) -> Vec<u8> {
+    kestrel_crypto::secure_random(len)
 }
 
 #[wasm_bindgen]
