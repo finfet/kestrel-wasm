@@ -12,5 +12,4 @@ kestrel-crypto = "1.0.1"
 getrandom = { version = "0.2.14", features = ["js"] }
 
 [profile.release]
-strip = "debuginfo"
 lto = true
