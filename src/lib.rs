@@ -211,7 +211,7 @@ fn fmt_error(err: &dyn std::any::Any) -> JsValue {
     } else if let Some(e) = err.downcast_ref::<&str>() {
         err_msg("ErrorMessage", e)
     } else {
-        err_msg("Unknown", "Unknown")
+        err_msg("UnknownError", "UnknownError")
     }
 }
 
