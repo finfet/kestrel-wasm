@@ -64,14 +64,16 @@ pub fn pass_decrypt(
 
 /// Key based encryption
 ///
-/// For ephem_private and payload_key, pass empty slices (Uint8Array) which
-/// will be treated as the None option
+/// For ephem_private, ephem_public and payload_key, pass
+/// empty slices (Uint8Array) which will be treated as the None option
 #[wasm_bindgen]
 pub fn key_encrypt(
     mut plaintext: &[u8],
     sender_private: &[u8],
+    sender_public: &[u8],
     recipient_public: &[u8],
     ephem_private: &[u8],
+    ephem_public: &[u8],
     payload_key: &[u8],
     file_format: u8,
 ) -> Result<Vec<u8>, JsValue> {
@@ -82,11 +84,22 @@ pub fn key_encrypt(
     };
 
     let sender_private: kestrel_crypto::PrivateKey = sender_private.into();
+    let sender_public = sender_public.into();
     let recipient_public: kestrel_crypto::PublicKey = recipient_public.into();
     let ephem_private: Option<kestrel_crypto::PrivateKey> = if ephem_private.is_empty() {
         None
     } else {
         Some(ephem_private.into())
+    };
+
+    if ephem_private.is_some() && ephem_public.is_empty() {
+        return Err(fmt_error(&"Public key is required if private is provided."));
+    };
+
+    let ephem_public: Option<kestrel_crypto::PublicKey> = if ephem_public.is_empty() {
+        None
+    } else {
+        Some(ephem_public.into())
     };
 
     let payload_key: Option<[u8; 32]> = if payload_key.is_empty() {
@@ -105,8 +118,10 @@ pub fn key_encrypt(
         &mut plaintext,
         &mut ciphertext,
         &sender_private,
+        &sender_public,
         &recipient_public,
         ephem_private.as_ref(),
+        ephem_public.as_ref(),
         payload_key,
         file_format,
     )
@@ -123,6 +138,7 @@ pub fn key_encrypt(
 pub fn key_decrypt(
     mut ciphertext: &[u8],
     recipient_private: &[u8],
+    recipient_public: &[u8],
     file_format: u8,
     public_key: &mut [u8],
 ) -> Result<Vec<u8>, JsValue> {
@@ -137,12 +153,14 @@ pub fn key_decrypt(
     }
 
     let recipient_private: kestrel_crypto::PrivateKey = recipient_private.into();
+    let recipient_public = recipient_public.into();
 
     let mut plaintext: Vec<u8> = Vec::with_capacity(calc_key_capacity(ciphertext.len()));
     let sender_public_key = kestrel_crypto::decrypt::key_decrypt(
         &mut ciphertext,
         &mut plaintext,
         &recipient_private,
+        &recipient_public,
         file_format,
     )
     .map_err(|e| fmt_error(&e))?;
