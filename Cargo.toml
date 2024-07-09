@@ -1,6 +1,6 @@
 [package]
 name = "kestrel-wasm"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 
 [lib]
@@ -8,7 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2.92"
-kestrel-crypto = "2.0.1"
+kestrel-crypto = "2.0.2"
 getrandom = { version = "0.2.15", features = ["js"] }
 
 [profile.release]
